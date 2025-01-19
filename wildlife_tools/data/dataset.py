@@ -120,7 +120,7 @@ class WildlifeDataset(ImageDataset):
         self.col_label = col_label
         self.load_label = load_label
         self.labels, self.labels_map = pd.factorize(self.metadata[self.col_label].values)
-
+        
     def __getitem__(self, idx):
         data = self.metadata.iloc[idx]
         if self.root:
