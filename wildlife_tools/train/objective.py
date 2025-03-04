@@ -13,7 +13,7 @@ class ArcFaceLoss(nn.Module):
         scale (int): Scale parameter for ArcFace loss.
     """
 
-    def __init__(self, num_classes: int, embedding_size: int, margin: int = 0.5, scale: int = 64):
+    def __init__(self, num_classes: int, embedding_size: int, margin: float = 0.5, scale: int = 64):
         super().__init__()
         self.loss = losses.ArcFaceLoss(
             num_classes=num_classes,
