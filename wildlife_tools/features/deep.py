@@ -1,13 +1,17 @@
 import torch
 from tqdm import tqdm
 from transformers import CLIPModel, CLIPProcessor
-
 from ..data import FeatureDataset, ImageDataset
+import pandas as pd
 
 
 class DeepFeatures:
     """
     Extracts features using forward pass of pytorch model.
+
+    Modified by CINJ 20250311:
+        fix for mid-pipeline CUDA reinit
+        and non-ImageDataset issues during inference
     """
 
     def __init__(
@@ -30,42 +34,53 @@ class DeepFeatures:
         self.num_workers = num_workers
         self.device = device
         self.model = model
-
-    def __call__(self, dataset: ImageDataset) -> FeatureDataset:
+        self.model = self.model.to(self.device)
+        self.model = self.model.eval()
+        
+    def __call__(self, dataset: ImageDataset|list) -> FeatureDataset:
         """
         Extract features from input dataset and return them as a new FeatureDataset.
 
         Args:
             dataset: Extract features from this dataset.
 
-
         Returns:
             feature_dataset: A FeatureDataset containing the extracted features
         """
-
-        self.model = self.model.to(self.device)
-        self.model = self.model.eval()
-
+        # self.model = self.model.to(self.device)
+        # self.model = self.model.eval()
         loader = torch.utils.data.DataLoader(
             dataset,
             num_workers=self.num_workers,
             batch_size=self.batch_size,
             shuffle=False,
+            collate_fn=None,
         )
         outputs = []
-        for image, _ in tqdm(loader, mininterval=1, ncols=100):
+        for item in tqdm(loader, mininterval=1, ncols=100):
             with torch.no_grad():
-                output = self.model(image.to(self.device))
+                output = self.model(item[0].to(self.device))
                 outputs.append(output.cpu())
-
-        self.model = self.model.to("cpu")
+        # self.model = self.model.to("cpu")
         features = torch.cat(outputs).numpy()
 
-        return FeatureDataset(
-            metadata=dataset.metadata,
-            features=features,
-            col_label=dataset.col_label,
-        )
+        # CINJ: Hack to handle unknown inference on a single image
+        if type(dataset) is list:
+            return FeatureDataset(
+                metadata=pd.DataFrame(
+                    {"path": ["" for o in dataset],
+                     "identity": ["unknown" for o in dataset]
+                     }
+                ),
+                features=features,
+                col_label="identity",
+            )
+        else:
+            return FeatureDataset(
+                metadata=dataset.metadata,
+                features=features,
+                col_label=dataset.col_label,
+            )
 
 
 class ClipFeatures:
@@ -104,7 +119,7 @@ class ClipFeatures:
         self.device = device
         self.transform = lambda x: processor(images=x, return_tensors="pt")["pixel_values"]
 
-    def __call__(self, dataset: ImageDataset) -> FeatureDataset:
+    def __call__(self, dataset: ImageDataset|list) -> FeatureDataset:
         """
         Extract clip features from input dataset and return them as a new FeatureDataset.
 
@@ -117,7 +132,6 @@ class ClipFeatures:
         """
         self.model = self.model.to(self.device)
         self.model = self.model.eval()
-
         dataset.transforms = None  # Reset transforms.
 
         loader = torch.utils.data.DataLoader(

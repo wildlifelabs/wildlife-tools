@@ -101,7 +101,6 @@ class WildlifeDataset(ImageDataset):
         labels_map dict: A mapping between labels and their ordinal encoding.
         num_classes int: Return the number of unique classes in the dataset.
     """
-
     def __init__(
         self,
         metadata: pd.DataFrame,

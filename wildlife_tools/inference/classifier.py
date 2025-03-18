@@ -45,7 +45,8 @@ class KnnClassifier:
         similarity = torch.tensor(similarity, dtype=torch.float32)
         scores, idx = similarity.topk(k=self.k, dim=1)
         preds = self.database_labels[idx]
-
+        if type(preds) is not list:
+            preds = [[preds]]
         preds = np.array(preds)
         scores = np.array(scores)
 
