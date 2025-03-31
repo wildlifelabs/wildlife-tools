@@ -57,7 +57,9 @@ class DeepFeatures:
             collate_fn=None,
         )
         outputs = []
-        for item in tqdm(loader, mininterval=1, ncols=100):
+        # commented out TQDM as it is being used at inference time!
+        # TODO: Cache this!
+        for item in loader:  # tqdm(loader, mininterval=1, ncols=100):
             with torch.no_grad():
                 output = self.model(item[0].to(self.device))
                 outputs.append(output.cpu())
