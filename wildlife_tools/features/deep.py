@@ -47,6 +47,8 @@ class DeepFeatures:
         Returns:
             feature_dataset: A FeatureDataset containing the extracted features
         """
+        if len(dataset) < 1:
+            raise ValueError("Cannot extract Deep Features from an empty dataset")
         # self.model = self.model.to(self.device)
         # self.model = self.model.eval()
         loader = torch.utils.data.DataLoader(
@@ -61,7 +63,7 @@ class DeepFeatures:
         # TODO: Cache this!
         for item in loader:  # tqdm(loader, mininterval=1, ncols=100):
             with torch.no_grad():
-                output = self.model(item[0].to(self.device))
+                output = self.model(item[0].squeeze(0).to(self.device))
                 outputs.append(output.cpu())
         # self.model = self.model.to("cpu")
         features = torch.cat(outputs).numpy()
@@ -132,6 +134,7 @@ class ClipFeatures:
         Returns:
             feature_dataset: A FeatureDataset containing the extracted features
         """
+        print("Calling Deep Features")
         self.model = self.model.to(self.device)
         self.model = self.model.eval()
         dataset.transforms = None  # Reset transforms.
@@ -155,3 +158,4 @@ class ClipFeatures:
             features=features,
             col_label=dataset.col_label,
         )
+    

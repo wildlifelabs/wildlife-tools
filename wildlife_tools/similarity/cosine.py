@@ -10,8 +10,8 @@ def cosine_similarity(a, b):
     Calculate cosine similarity between two sets of vectors.
     Pytorch Equivalent to `sklearn.metrics.pairwise.cosine_similarity`.
     """
-
-    a, b = torch.tensor(a), torch.tensor(b)
+    a = torch.tensor(a) if type(a) != torch.Tensor else a.detach().clone()
+    b = torch.tensor(b) if type(b) != torch.Tensor else b.detach().clone()
     similarity = torch.matmul(F.normalize(a), F.normalize(b).T)
     return similarity.numpy()
 
