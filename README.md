@@ -9,8 +9,12 @@
 </p>
 
 
+<p align="center">
+<img src="https://github.com/WildlifeDatasets/wildlife-tools/raw/main/docs/resources/tools-logo.png" alt="Wildlife tools" width="300">
+</p>
+
+
 <div align="center">
-  <img src="docs/resources/tools-logo.png" alt="Wildlife tools" width="300">
   <p align="center">A toolkit for Animal Individual Identification that covers use cases such as training, feature extraction, similarity calculation, image retrieval, and classification.</p>
 
   <a href="https://wildlifedatasets.github.io/wildlife-tools/">Documentation</a>
@@ -24,7 +28,7 @@
 
 ## Our other projects
 
-| <a href="https://github.com/WildlifeDatasets/wildlife-datasets"><img src="docs/resources/datasets-logo.png" alt="Wildlife datasets" width="200"></a>  | <a href="https://huggingface.co/BVRA/MegaDescriptor-L-384"><img src="docs/resources/megadescriptor-logo.png" alt="MegaDescriptor" width="200"></a> | <a href="https://github.com/WildlifeDatasets/wildlife-tools"><img src="docs/resources/tools-logo.png" alt="Wildlife tools" width="200"></a> |
+| <a href="https://github.com/WildlifeDatasets/wildlife-datasets"><img src="https://github.com/WildlifeDatasets/wildlife-tools/raw/main/docs/resources/datasets-logo.png" alt="Wildlife datasets" width="200"></a>  | <a href="https://huggingface.co/BVRA/MegaDescriptor-L-384"><img src="https://github.com/WildlifeDatasets/wildlife-tools/raw/main/docs/resources/megadescriptor-logo.png" alt="MegaDescriptor" width="200"></a> | <a href="https://github.com/WildlifeDatasets/wildlife-tools"><img src="https://github.com/WildlifeDatasets/wildlife-tools/raw/main/docs/resources/tools-logo.png" alt="Wildlife tools" width="200"></a> |
 |:--------------:|:-----------:|:------------:|
 | Datasets for identification of individual animals | Trained model for individual re&#x2011;identification  | Tools for training re&#x2011;identification models |
 
@@ -48,18 +52,14 @@ Here’s a summary of recent updates and changes.
 
 ## Installation
 
-To install `wildlife-tools`, you can build it from scratch or use pre-build Pypi package.
-
-
-### Using Pypi
+Install `wildlife-tools` using `pip`
 
 ```script
-pip install wildlife-tools
+pip install git+https://github.com/WildlifeDatasets/wildlife-tools
 ```
 
-### Building from scratch
+or clone the repository using `git` and install it.
 
-Clone the repository using `git` and install it.
 ```script
 git clone git@github.com:WildlifeDatasets/wildlife-tools.git
 
@@ -143,8 +143,8 @@ import numpy as np
 from wildlife_tools.inference import KnnClassifier
 
 classifier = KnnClassifier(k=1, database_labels=dataset_database.labels_string)
-predictions = classifier(similarity['cosine'])
-accuracy = np.mean(dataset_database.labels_string == predictions)
+predictions = classifier(similarity)
+accuracy = np.mean(dataset_query.labels_string == predictions)
 ```
 
 ## Citation
