@@ -50,6 +50,13 @@ class KnnClassifier:
         preds = np.array(preds)
         scores = np.array(scores)
 
+        # FIX by CINJ 20250822 - incorrect data shapes break everything
+        # ...and the shapes can change if there are more than one prediction!
+        if len(preds.shape) > 2:
+            preds = np.expand_dims(preds.squeeze(), axis=1)
+            scores = np.expand_dims(scores.squeeze(), axis=1)
+        # END FIX
+        
         # Aggregate k nearest neighbors
         data = []
         for pred, score in zip(preds, scores):
